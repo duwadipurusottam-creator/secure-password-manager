@@ -1,4 +1,4 @@
-# 🔐 Secure Password Manager  
+# Secure Password Manager  
 **ICT306 – Advanced Cybersecurity | Assessment 3**
 
 A security-first, zero-knowledge password manager built using **Python (Flask)** that demonstrates the full implementation of the **Secure Software Development Lifecycle (SSDLC)**.  
@@ -6,7 +6,7 @@ The application focuses on strong cryptography, secure authentication, defense-i
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 This project implements a **web-based secure password manager** where all sensitive data is encrypted using a master password derived key.  
 The system is designed so that **no plaintext passwords are ever stored**, and the server cannot access user credentials without the correct master password.
@@ -15,7 +15,7 @@ The project was developed following **OWASP best practices** and demonstrates pr
 
 ---
 
-## 🛡️ Key Security Features
+## Key Security Features
 
 - **Zero-Knowledge Architecture**  
   - Master password is never stored or transmitted
@@ -51,7 +51,7 @@ The project was developed following **OWASP best practices** and demonstrates pr
 
 ---
 
-## 🧱 SSDLC Phases Implemented
+## SSDLC Phases Implemented
 
 1. **Security Requirements & Planning**
 2. **Threat Modeling (STRIDE)**
@@ -63,7 +63,7 @@ The project was developed following **OWASP best practices** and demonstrates pr
 
 ---
 
-## 🧪 Security Testing Summary
+## Security Testing Summary
 
 - **Total Tests Conducted:** 36  
 - **Pass Rate:** 100%
@@ -79,7 +79,7 @@ All critical vulnerabilities were either mitigated or fully prevented.
 
 ---
 
-## 🖥️ Technology Stack
+## Technology Stack
 
 - **Backend:** Python, Flask
 - **Frontend:** HTML, CSS, JavaScript
@@ -89,7 +89,7 @@ All critical vulnerabilities were either mitigated or fully prevented.
 
 ---
 
-## 🚀 How to Run the Application
+## How to Run the Application
 
 ### Prerequisites
 - Python 3.10+
@@ -98,3 +98,4 @@ All critical vulnerabilities were either mitigated or fully prevented.
 ### Setup
 ```bash
 pip install flask cryptography
+
