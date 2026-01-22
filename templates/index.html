@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Manager - ICT306</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .security-badge {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .security-badge strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 4px;
+        }
+
+        .password-requirements li.valid {
+            color: #10b981;
+        }
+
+        .password-requirements li.invalid {
+            color: #ef4444;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        button.danger {
+            background: #dc3545;
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        .vault-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .vault-controls button {
+            flex: 1;
+        }
+
+        .password-list {
+            margin-top: 30px;
+        }
+
+        .password-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .password-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .password-item h3 {
+            color: #333;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .password-item p {
+            color: #666;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .password-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .password-actions button {
+            padding: 8px 16px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .revealed-password {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .session-info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #0066cc;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Secure Password Manager</h1>
+        <p class="subtitle">ICT306 Advanced Cybersecurity - SSDLC Implementation</p>
+
+        <div class="security-badge">
+            <strong>🛡️ Zero-Knowledge Security</strong>
+            Your master password never leaves your device. All encryption happens locally using AES-256 with PBKDF2 key derivation (100,000 iterations). We cannot access your passwords - only you can.
+        </div>
+
+        <div id="error-container"></div>
+
+        <!-- Create Vault Section -->
+        <div id="create-vault-section" class="form-section active">
+            <h2 style="margin-bottom: 20px; color: #333;">Create Your Vault</h2>
+            <div class="form-group">
+                <label for="create-master-password">Master Password</label>
+                <input type="password" id="create-master-password" placeholder="Enter a strong master password">
+                <ul class="password-requirements" id="password-requirements">
+                    <li id="req-length" class="invalid">✗ At least 12 characters</li>
+                    <li id="req-uppercase" class="invalid">✗ One uppercase letter</li>
+                    <li id="req-lowercase" class="invalid">✗ One lowercase letter</li>
+                    <li id="req-number" class="invalid">✗ One number</li>
+                    <li id="req-special" class="invalid">✗ One special character (!@#$%^&*)</li>
+                </ul>
+            </div>
+            <div class="form-group">
+                <label for="confirm-master-password">Confirm Master Password</label>
+                <input type="password" id="confirm-master-password" placeholder="Re-enter your master password">
+            </div>
+            <button onclick="createVault()">Create Vault</button>
+            <button class="secondary" onclick="showUnlockVault()">Already have a vault? Unlock</button>
+        </div>
+
+        <!-- Unlock Vault Section -->
+        <div id="unlock-vault-section" class="form-section">
+            <h2 style="margin-bottom: 20px; color: #333;">Unlock Your Vault</h2>
+            <div class="session-info" id="session-display"></div>
+            <div class="form-group">
+                <label for="unlock-master-password">Master Password</label>
+                <input type="password" id="unlock-master-password" placeholder="Enter your master password">
+            </div>
+            <button onclick="unlockVault()">Unlock Vault</button>
+            <button class="secondary" onclick="showCreateVault()">Create New Vault</button>
+        </div>
+
+        <!-- Vault Manager Section -->
+        <div id="vault-section" class="form-section">
+            <div class="session-info">
+                🔓 Vault unlocked - Auto-lock in 15 minutes of inactivity
+            </div>
+
+            <div class="vault-controls">
+                <button class="success" onclick="showAddPassword()">+ Add Password</button>
+                <button class="danger" onclick="lockVault()">🔒 Lock Vault</button>
+            </div>
+
+            <!-- Add Password Form -->
+            <div id="add-password-form" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px; color: #333;">Add New Password</h3>
+                <div class="form-group">
+                    <label for="website">Website/Service</label>
+                    <input type="text" id="website" placeholder="e.g., google.com">
+                </div>
+                <div class="form-group">
+                    <label for="username">Username/Email</label>
+                    <input type="text" id="username" placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="addPassword()">Save Password</button>
+                    <button class="secondary" onclick="cancelAddPassword()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Password List -->
+            <div class="password-list">
+                <h3 style="margin-bottom: 15px; color: #333;">Your Passwords</h3>
+                <div id="passwords-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-notification" id="copy-notification">
+        ✓ Copied to clipboard! Will auto-clear in 30 seconds.
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let clipboardTimeout = null;
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            clearError();
+        }
+
+        function showCreateVault() {
+            showSection('create-vault-section');
+        }
+
+        function showUnlockVault() {
+            showSection('unlock-vault-section');
+            if (currentSessionId) {
+                document.getElementById('session-display').textContent = `Session ID: ${currentSessionId.substring(0, 8)}...`;
+            }
+        }
+
+        function showAddPassword() {
+            document.getElementById('add-password-form').style.display = 'block';
+        }
+
+        function cancelAddPassword() {
+            document.getElementById('add-password-form').style.display = 'none';
+            document.getElementById('website').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Error/Success handling
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        function showSuccess(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="success-message">${message}</div>`;
+            setTimeout(clearError, 3000);
+        }
+
+        function clearError() {
+            document.getElementById('error-container').innerHTML = '';
+        }
+
+        // Password strength validation (real-time)
+        document.getElementById('create-master-password')?.addEventListener('input', function(e) {
+            const password = e.target.value;
+            
+            const checks = {
+                'req-length': password.length >= 12,
+                'req-uppercase': /[A-Z]/.test(password),
+                'req-lowercase': /[a-z]/.test(password),
+                'req-number': /\d/.test(password),
+                'req-special': /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            for (let [id, valid] of Object.entries(checks)) {
+                const elem = document.getElementById(id);
+                if (valid) {
+                    elem.classList.remove('invalid');
+                    elem.classList.add('valid');
+                    elem.textContent = '✓' + elem.textContent.substring(1);
+                } else {
+                    elem.classList.remove('valid');
+                    elem.classList.add('invalid');
+                    elem.textContent = '✗' + elem.textContent.substring(1);
+                }
+            }
+        });
+
+        // Create vault
+        async function createVault() {
+            const password = document.getElementById('create-master-password').value;
+            const confirmPassword = document.getElementById('confirm-master-password').value;
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/create-vault', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({master_password: password})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Vault created successfully!');
+                    document.getElementById('create-master-password').value = '';
+                    document.getElementById('confirm-master-password').value = '';
+                    setTimeout(() => {
+                        showSection('vault-section');
+                        loadPasswords();
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Failed to create vault');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // Unlock vault
+        async function unlockVault() {
+            const password = document.getElementById('unlock-master-password').value;
+
+            if (!currentSessionId) {
+                showError('No session found. Please create a new vault.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/unlock-vault', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        master_password: password,
+                        session_id: currentSessionId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Vault unlocked!');
+                    document.getElementById('unlock-master-password').value = '';
+                    setTimeout(() => {
+                        showSection('vault-section');
+                        loadPasswords();
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Failed to unlock vault');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // Add password
+        async function addPassword() {
+            const website = document.getElementById('website').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!website || !username || !password) {
+                showError('All fields are required!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add-password', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({website, username, password})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Password added successfully!');
+                    cancelAddPassword();
+                    loadPasswords();
+                } else {
+                    showError(data.error || 'Failed to add password');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // Load passwords
+        async function loadPasswords() {
+            try {
+                const response = await fetch('/api/get-passwords');
+                const data = await response.json();
+
+                if (response.ok) {
+                    const container = document.getElementById('passwords-container');
+                    
+                    if (data.passwords.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                <p>No passwords stored yet</p>
+                                <p style="font-size: 12px; margin-top: 5px;">Click "Add Password" to get started</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = data.passwords.map(p => `
+                        <div class="password-item">
+                            <div class="password-item-header">
+                                <h3>🌐 ${escapeHtml(p.website)}</h3>
+                            </div>
+                            <p><strong>Username:</strong> ${escapeHtml(p.username)}</p>
+                            <p style="font-size: 12px; color: #999;">Added: ${new Date(p.created_at).toLocaleString()}</p>
+                            <div class="password-actions">
+                                <button onclick="revealPassword('${p.id}', this)">Show Password</button>
+                            </div>
+                            <div id="revealed-${p.id}"></div>
+                        </div>
+                    `).join('');
+                } else {
+                    if (response.status === 401) {
+                        showError('Session expired. Please unlock vault again.');
+                        showSection('unlock-vault-section');
+                    } else {
+                        showError(data.error || 'Failed to load passwords');
+                    }
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // Reveal password
+        async function revealPassword(passwordId, button) {
+            try {
+                const response = await fetch('/api/reveal-password', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password_id: passwordId})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const container = document.getElementById(`revealed-${passwordId}`);
+                    container.innerHTML = `
+                        <div class="revealed-password">
+                            <strong>Password:</strong> ${escapeHtml(data.password)}
+                            <button style="margin-top: 10px; width: auto; padding: 6px 12px; font-size: 12px;" onclick="copyToClipboard('${escapeHtml(data.password)}')">
+                                📋 Copy to Clipboard
+                            </button>
+                        </div>
+                    `;
+                    button.textContent = 'Hide Password';
+                    button.onclick = () => {
+                        container.innerHTML = '';
+                        button.textContent = 'Show Password';
+                        button.onclick = () => revealPassword(passwordId, button);
+                    };
+                } else {
+                    showError(data.error || 'Failed to reveal password');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        // Copy to clipboard with auto-clear
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show notification
+                const notification = document.getElementById('copy-notification');
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+
+                // Clear clipboard after 30 seconds
+                if (clipboardTimeout) clearTimeout(clipboardTimeout);
+                clipboardTimeout = setTimeout(() => {
+                    navigator.clipboard.writeText('');
+                }, 30000);
+            });
+        }
+
+        // Lock vault
+        async function lockVault() {
+            try {
+                await fetch('/api/lock-vault', {method: 'POST'});
+                showSuccess('Vault locked securely');
+                setTimeout(() => {
+                    showSection('unlock-vault-section');
+                }, 1000);
+            } catch (error) {
+                showError('Error locking vault');
+            }
+        }
+
+        // HTML escaping for XSS prevention
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Generate session ID for first-time users
+            if (!currentSessionId) {
+                currentSessionId = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+        };
+    </script>
+</body>
+</html>
