@@ -299,8 +299,8 @@
         <p class="subtitle">ICT306 Advanced Cybersecurity - SSDLC Implementation</p>
 
         <div class="security-badge">
-            <strong>🛡️ Zero-Knowledge Security</strong>
-            Your master password never leaves your device. All encryption happens locally using AES-256 with PBKDF2 key derivation (100,000 iterations). We cannot access your passwords - only you can.
+            <strong>🛡️ How Your Data Is Protected</strong>
+            Your master password is sent to the server, which derives a key with PBKDF2 (100,000 iterations) and encrypts your saved passwords with Fernet (AES with an HMAC integrity check). Data is kept in memory only and is lost when the app stops.
         </div>
 
         <div id="error-container"></div>
@@ -342,7 +342,7 @@
         <!-- Vault Manager Section -->
         <div id="vault-section" class="form-section">
             <div class="session-info">
-                🔓 Vault unlocked - Auto-lock in 15 minutes of inactivity
+                🔓 Vault unlocked - Remember to lock it when you're done
             </div>
 
             <div class="vault-controls">
